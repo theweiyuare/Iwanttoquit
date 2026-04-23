@@ -3,113 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台灣ETF退休複利計算機｜0050+00981A+00939+00940</title>
+    <title>通用退休複利計算機｜含通膨調整</title>
     <style>
-        body{font-family:微軟正黑體,Noto Sans TC;background:#f5f7fa;margin:0;padding:20px;}
-        .container{max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:16px;box-shadow:0 4px 12px #00000015;}
-        h2{color:#2c3e50;text-align:center;margin-top:0;}
-        .item{margin:12px 0;}
-        label{display:block;margin-bottom:6px;color:#555;}
-        input,select{width:100%;padding:10px;border:1px #ddd solid;border-radius:8px;box-sizing:border-box;font-size:16px;}
-        button{width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:8px;font-size:17px;margin-top:15px;cursor:pointer;}
-        .result{margin-top:20px;padding:15px;background:#f8f9fc;border-radius:10px;}
-        .result h4{margin:0 0 10px;color:#2c3e50;}
-        .res-item{padding:6px 0;font-size:16px;}
-        .red{color:#e63946;}
-        .green{color:#2a9d8f;}
+        body{font-family:Noto Sans TC,微軟正黑體;background:#f3f5f8;margin:0;padding:20px;}
+        .box{max-width:580px;margin:0 auto;background:#ffffff;padding:24px;border-radius:20px;box-shadow:0 2px 10px #00000012;}
+        h3{text-align:center;color:#333;margin-top:0;}
+        .row{margin:14px 0;}
+        label{display:block;margin-bottom:5px;color:#555;font-size:15px;}
+        input,select{width:100%;box-sizing:border-box;padding:10px 12px;border:1px #ddd solid;border-radius:10px;font-size:16px;}
+        button{width:100%;border:none;background:#4a80d8;color:white;padding:12px;border-radius:10px;font-size:16px;margin-top:10px;cursor:pointer;}
+        .out{margin-top:22px;padding:16px;background:#f8f9fb;border-radius:12px;}
+        .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .item{margin:6px 0;font-size:15px;}
+        .bold{font-weight:bold;color:#222;}
+        .grey{color:#777;}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>退休ETF複利試算機</h2>
+    <div class="box">
+        <h3>退休財務複利試算</h3>
 
-        <div class="item">
+        <div class="row">
             <label>目前年齡</label>
-            <input type="number" id="age" value="36">
+            <input type="number" id="age" placeholder="例如：36">
         </div>
-        <div class="item">
-            <label>目標退休歲數</label>
-            <input type="number" id="retireAge" value="60">
+        <div class="row">
+            <label>預計退休年齡</label>
+            <input type="number" id="retire" placeholder="例如：60">
         </div>
-        <div class="item">
-            <label>現有0050資產(元)</label>
-            <input type="number" id="etf50" value="213809">
+        <div class="row">
+            <label>現有閒置現金資產（元）</label>
+            <input type="number" id="cash" placeholder="活存、定存、可投資現金">
         </div>
-        <div class="item">
-            <label>現有00939+00940合計(元)</label>
-            <input type="number" id="highDiv" value="420000">
+        <div class="row">
+            <label>現有股票／ETF 總資產（元）</label>
+            <input type="number" id="stockAsset" placeholder="全部個股+ETF合計">
         </div>
-        <div class="item">
-            <label>閒置現金準備投入(元)</label>
-            <input type="number" id="cash" value="1000000">
+        <div class="row">
+            <label>每月定期定額 總金額（元）</label>
+            <input type="number" id="monthly" placeholder="整體每月投入金額">
         </div>
-        <div class="item">
-            <label>每月定期定額_0050 (元)</label>
-            <input type="number" id="month50" value="15000">
-        </div>
-        <div class="item">
-            <label>每月定期定額_00981A (元)</label>
-            <input type="number" id="month981A" value="3000">
-        </div>
-        <div class="item">
-            <label>年化報酬率</label>
+        <div class="row">
+            <label>長期年化報酬率</label>
             <select id="rate">
-                <option value="0.05">5% 超保守(含息)</option>
+                <option value="0.04">4% 極度保守</option>
+                <option value="0.05">5% 保守穩健</option>
                 <option value="0.06" selected>6% 中性合理</option>
+                <option value="0.07">7% 成長偏強</option>
+                <option value="0.08">8% 樂觀成長</option>
             </select>
         </div>
 
         <button onclick="calc()">開始試算</button>
 
-        <div class="result">
-            <h4>📊 試算結果</h4>
-            <div class="res-item">剩餘投資年數：<span id="year"></span> 年</div>
-            <div class="res-item">最終總資產：<span class="green" id="total"></span></div>
-            <div class="res-item">退休每年被動收入(3%提領)：<span id="yearly"></span></div>
-            <div class="res-item">退休每月被動收入：<span class="red" id="monthly"></span></div>
+        <div class="out">
+            <div class="item">剩餘投資年數：<span id="year"></span> 年</div>
+            <div class="grey" style="font-size:14px;margin:8px 0;">
+                ＊預設長期通膨率 2.2%
+            </div>
+
+            <div class="split">
+                <div>
+                    <div class="item bold">【名目金額｜未扣通膨】</div>
+                    <div class="item">最終總資產：<span id="nominalTotal"></span></div>
+                    <div class="item">年被動收入(3%)：<span id="nominalYear"></span></div>
+                    <div class="item">每月被動收入：<span id="nominalMonth"></span></div>
+                </div>
+                <div>
+                    <div class="item bold">【實質金額｜扣通膨2.2%】</div>
+                    <div class="item">實質購買力：<span id="realTotal"></span></div>
+                    <div class="item">實質年收入：<span id="realYear"></span></div>
+                    <div class="item">實質月收入：<span id="realMonth"></span></div>
+                </div>
+            </div>
         </div>
     </div>
 
 <script>
-// 複利公式 整筆金額
-function lumpSum(pv,r,t){
-  return pv * Math.pow(1+r,t);
+// 整筆複利
+function lump(pv, r, t){
+    return pv * Math.pow(1 + r, t);
 }
-// 定期定額 月投入
-function monthlySave(month,r,year){
-  let monthRate = r / 12;
-  let totalMonth = year * 12;
-  return month * (((Math.pow(1+monthRate,totalMonth)-1)) / monthRate);
+// 每月定額月複利
+function monthlyFix(monthPay, r, year){
+    let mr = r / 12;
+    let totalMonth = year * 12;
+    return monthPay * (Math.pow(1 + mr, totalMonth) - 1) / mr;
 }
 
 function calc(){
-    let age = parseInt(document.getElementById('age').value);
-    let retireAge = parseInt(document.getElementById('retireAge').value);
-    let t = retireAge - age;
-    let rate = parseFloat(document.getElementById('rate').value);
+    let age = Number(document.getElementById('age').value);
+    let retire = Number(document.getElementById('retire').value);
+    let cash = Number(document.getElementById('cash').value) || 0;
+    let stock = Number(document.getElementById('stockAsset').value) || 0;
+    let monthPay = Number(document.getElementById('monthly').value) || 0;
+    let rate = Number(document.getElementById('rate').value);
+    let inflate = 0.022;
 
-    let e50 = parseInt(document.getElementById('etf50').value);
-    let hd = parseInt(document.getElementById('highDiv').value);
-    let cash = parseInt(document.getElementById('cash').value);
-    let m50 = parseInt(document.getElementById('month50').value);
-    let m981 = parseInt(document.getElementById('month981A').value);
+    let year = retire - age;
+    if(year <= 0){
+        alert('退休年齡必須大於目前年齡');
+        return;
+    }
 
-    // 整筆複利
-    let e50End = lumpSum(e50, rate, t);
-    let hdEnd = lumpSum(hd, rate, t);
-    let cashEnd = lumpSum(cash, rate, t);
+    // 名目總報酬
+    let cashEnd = lump(cash, rate, year);
+    let stockEnd = lump(stock, rate, year);
+    let monthEnd = monthlyFix(monthPay, rate, year);
+    let totalNominal = cashEnd + stockEnd + monthEnd;
 
-    // 每月定額
-    let monthTotal = monthlySave(m50,rate,t) + monthlySave(m981,rate,t);
+    // 實質年化 = 名目利率 - 通膨
+    let realRate = rate - inflate;
+    let cashReal = lump(cash, realRate, year);
+    let stockReal = lump(stock, realRate, year);
+    let monthReal = monthlyFix(monthPay, realRate, year);
+    let totalReal = cashReal + stockReal + monthReal;
 
-    let total = e50End + hdEnd + cashEnd + monthTotal;
-    let yearly = total * 0.03;
-    let monthly = yearly / 12;
+    // 3% 提領
+    let yearNominal = totalNominal * 0.03;
+    let monthNominal = yearNominal / 12;
+    let yearReal = totalReal * 0.03;
+    let monthReal = yearReal / 12;
 
-    document.getElementById('year').innerText = t;
-    document.getElementById('total').innerText = Math.round(total).toLocaleString() + " 元";
-    document.getElementById('yearly').innerText = Math.round(yearly).toLocaleString() + " 元";
-    document.getElementById('monthly').innerText = Math.round(monthly).toLocaleString() + " 元";
+    // 輸出
+    document.getElementById('year').innerText = year;
+    document.getElementById('nominalTotal').innerText = Math.round(totalNominal).toLocaleString() + ' 元';
+    document.getElementById('nominalYear').innerText = Math.round(yearNominal).toLocaleString() + ' 元';
+    document.getElementById('nominalMonth').innerText = Math.round(monthNominal).toLocaleString() + ' 元';
+
+    document.getElementById('realTotal').innerText = Math.round(totalReal).toLocaleString() + ' 元';
+    document.getElementById('realYear').innerText = Math.round(yearReal).toLocaleString() + ' 元';
+    document.getElementById('realMonth').innerText = Math.round(monthReal).toLocaleString() + ' 元';
 }
 </script>
 </body>
