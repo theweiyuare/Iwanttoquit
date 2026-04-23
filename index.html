@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣ETF退休複利計算機｜0050+00981A+00939+00940</title>
+    <style>
+        body{font-family:微軟正黑體,Noto Sans TC;background:#f5f7fa;margin:0;padding:20px;}
+        .container{max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:16px;box-shadow:0 4px 12px #00000015;}
+        h2{color:#2c3e50;text-align:center;margin-top:0;}
+        .item{margin:12px 0;}
+        label{display:block;margin-bottom:6px;color:#555;}
+        input,select{width:100%;padding:10px;border:1px #ddd solid;border-radius:8px;box-sizing:border-box;font-size:16px;}
+        button{width:100%;padding:12px;background:#2c7be5;color:#fff;border:none;border-radius:8px;font-size:17px;margin-top:15px;cursor:pointer;}
+        .result{margin-top:20px;padding:15px;background:#f8f9fc;border-radius:10px;}
+        .result h4{margin:0 0 10px;color:#2c3e50;}
+        .res-item{padding:6px 0;font-size:16px;}
+        .red{color:#e63946;}
+        .green{color:#2a9d8f;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>退休ETF複利試算機</h2>
+
+        <div class="item">
+            <label>目前年齡</label>
+            <input type="number" id="age" value="36">
+        </div>
+        <div class="item">
+            <label>目標退休歲數</label>
+            <input type="number" id="retireAge" value="60">
+        </div>
+        <div class="item">
+            <label>現有0050資產(元)</label>
+            <input type="number" id="etf50" value="213809">
+        </div>
+        <div class="item">
+            <label>現有00939+00940合計(元)</label>
+            <input type="number" id="highDiv" value="420000">
+        </div>
+        <div class="item">
+            <label>閒置現金準備投入(元)</label>
+            <input type="number" id="cash" value="1000000">
+        </div>
+        <div class="item">
+            <label>每月定期定額_0050 (元)</label>
+            <input type="number" id="month50" value="15000">
+        </div>
+        <div class="item">
+            <label>每月定期定額_00981A (元)</label>
+            <input type="number" id="month981A" value="3000">
+        </div>
+        <div class="item">
+            <label>年化報酬率</label>
+            <select id="rate">
+                <option value="0.05">5% 超保守(含息)</option>
+                <option value="0.06" selected>6% 中性合理</option>
+            </select>
+        </div>
+
+        <button onclick="calc()">開始試算</button>
+
+        <div class="result">
+            <h4>📊 試算結果</h4>
+            <div class="res-item">剩餘投資年數：<span id="year"></span> 年</div>
+            <div class="res-item">最終總資產：<span class="green" id="total"></span></div>
+            <div class="res-item">退休每年被動收入(3%提領)：<span id="yearly"></span></div>
+            <div class="res-item">退休每月被動收入：<span class="red" id="monthly"></span></div>
+        </div>
+    </div>
+
+<script>
+// 複利公式 整筆金額
+function lumpSum(pv,r,t){
+  return pv * Math.pow(1+r,t);
+}
+// 定期定額 月投入
+function monthlySave(month,r,year){
+  let monthRate = r / 12;
+  let totalMonth = year * 12;
+  return month * (((Math.pow(1+monthRate,totalMonth)-1)) / monthRate);
+}
+
+function calc(){
+    let age = parseInt(document.getElementById('age').value);
+    let retireAge = parseInt(document.getElementById('retireAge').value);
+    let t = retireAge - age;
+    let rate = parseFloat(document.getElementById('rate').value);
+
+    let e50 = parseInt(document.getElementById('etf50').value);
+    let hd = parseInt(document.getElementById('highDiv').value);
+    let cash = parseInt(document.getElementById('cash').value);
+    let m50 = parseInt(document.getElementById('month50').value);
+    let m981 = parseInt(document.getElementById('month981A').value);
+
+    // 整筆複利
+    let e50End = lumpSum(e50, rate, t);
+    let hdEnd = lumpSum(hd, rate, t);
+    let cashEnd = lumpSum(cash, rate, t);
+
+    // 每月定額
+    let monthTotal = monthlySave(m50,rate,t) + monthlySave(m981,rate,t);
+
+    let total = e50End + hdEnd + cashEnd + monthTotal;
+    let yearly = total * 0.03;
+    let monthly = yearly / 12;
+
+    document.getElementById('year').innerText = t;
+    document.getElementById('total').innerText = Math.round(total).toLocaleString() + " 元";
+    document.getElementById('yearly').innerText = Math.round(yearly).toLocaleString() + " 元";
+    document.getElementById('monthly').innerText = Math.round(monthly).toLocaleString() + " 元";
+}
+</script>
+</body>
+</html>
