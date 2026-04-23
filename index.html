@@ -80,52 +80,49 @@
     </div>
 
 <script>
-// 整筆複利
-function lump(pv, r, t){
+function lump(pv, r, t) {
     return pv * Math.pow(1 + r, t);
 }
-// 每月定額月複利
-function monthlyFix(monthPay, r, year){
+
+function monthlyFix(monthPay, r, year) {
     let mr = r / 12;
     let totalMonth = year * 12;
     return monthPay * (Math.pow(1 + mr, totalMonth) - 1) / mr;
 }
 
-function calc(){
-    let age = Number(document.getElementById('age').value);
-    let retire = Number(document.getElementById('retire').value);
-    let cash = Number(document.getElementById('cash').value) || 0;
-    let stock = Number(document.getElementById('stockAsset').value) || 0;
-    let monthPay = Number(document.getElementById('monthly').value) || 0;
-    let rate = Number(document.getElementById('rate').value);
+function calc() {
+    let age = parseFloat(document.getElementById('age').value || 0);
+    let retire = parseFloat(document.getElementById('retire').value || 0);
+    let cash = parseFloat(document.getElementById('cash').value || 0);
+    let stock = parseFloat(document.getElementById('stockAsset').value || 0);
+    let monthPay = parseFloat(document.getElementById('monthly').value || 0);
+    let rate = parseFloat(document.getElementById('rate').value);
     let inflate = 0.022;
 
     let year = retire - age;
-    if(year <= 0){
+    if (year <= 0) {
         alert('退休年齡必須大於目前年齡');
         return;
     }
 
-    // 名目總報酬
+    // 名目
     let cashEnd = lump(cash, rate, year);
     let stockEnd = lump(stock, rate, year);
     let monthEnd = monthlyFix(monthPay, rate, year);
     let totalNominal = cashEnd + stockEnd + monthEnd;
 
-    // 實質年化 = 名目利率 - 通膨
+    // 實質
     let realRate = rate - inflate;
     let cashReal = lump(cash, realRate, year);
     let stockReal = lump(stock, realRate, year);
     let monthReal = monthlyFix(monthPay, realRate, year);
     let totalReal = cashReal + stockReal + monthReal;
 
-    // 3% 提領
     let yearNominal = totalNominal * 0.03;
     let monthNominal = yearNominal / 12;
     let yearReal = totalReal * 0.03;
     let monthReal = yearReal / 12;
 
-    // 輸出
     document.getElementById('year').innerText = year;
     document.getElementById('nominalTotal').innerText = Math.round(totalNominal).toLocaleString() + ' 元';
     document.getElementById('nominalYear').innerText = Math.round(yearNominal).toLocaleString() + ' 元';
