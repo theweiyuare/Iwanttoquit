@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>退休複利完整試算機</title>
+    <title>退休資產複利試算機｜含年終投入</title>
     <style>
         * {
             margin: 0;
@@ -62,20 +62,13 @@
         button:hover {
             background-color: #2b6cb0;
         }
-        .result-wrap {
-            margin-top: px;
-        }
         .card {
             border-radius: 14px;
             padding: 18px;
             margin-top: 16px;
         }
-        .card-blue {
-            background: #f3f8ff;
-        }
-        .card-gray {
-            background: #f7f8fa;
-        }
+        .card-blue { background: #f3f8ff; }
+        .card-gray { background: #f7f8fa; }
         .tit {
             font-weight: 600;
             color: #2d3748;
@@ -94,7 +87,14 @@
         .text-small {
             font-size: 13px;
             color: #718096;
-            margin-top: 4px;
+        }
+        .advice {
+            margin-top:20px;
+            padding:16px;
+            background:#fff6e9;
+            border-radius:14px;
+            font-size:14px;
+            color:#5c4b38;
         }
     </style>
 </head>
@@ -111,16 +111,23 @@
         <input type="number" id="retireAge" value="60">
     </div>
     <div class="item">
-        <label>現有閒置現金（元）</label>
+        <label>現有閒置現金（未來分批投入）</label>
         <input type="number" id="cash" value="1000000">
+        <div class="text-small">建議保留6~12個月生活費當緊急預備金</div>
     </div>
     <div class="item">
-        <label>股票＋ETF 總資產（元）</label>
+        <label>股票＋ETF 長期持有總資產</label>
         <input type="number" id="stockAsset" value="833809">
+        <div class="text-small">包含0050、00939、00940、長期持有個股</div>
     </div>
     <div class="item">
-        <label>每月定期定額總金額（元）</label>
+        <label>每月定期定額總金額</label>
         <input type="number" id="monthSave" value="18000">
+    </div>
+    <div class="item">
+        <label>每年年終額外投入</label>
+        <input type="number" id="yearBonus" value="30000">
+        <div class="text-small">保守抓：年終/獎金額外理財預算</div>
     </div>
     <div class="item">
         <label>長期年化報酬率</label>
@@ -135,35 +142,44 @@
 
     <button onclick="calcAll()">開始試算</button>
 
-    <div class="result-wrap">
-        <div class="row-text">投資年限：<span class="num-bold" id="yearCount"></span></div>
+    <div class="row-text" style="margin-top:16px;">投資年限：<span class="num-bold" id="yearCount"></span></div>
 
-        <div class="card card-blue">
-            <div class="tit">名目金額（未扣除通膨）</div>
-            <div class="row-text">最終累積總資產：<span class="num-bold" id="totalNominal"></span></div>
-            <div class="row-text">退休每月被動收入(3%提領)：<span class="num-bold" id="monthNominal"></span></div>
-            <div class="text-small">說明：單純複利增長，一般參考使用</div>
-        </div>
+    <div class="card card-blue">
+        <div class="tit">名目金額（未扣通膨）</div>
+        <div class="row-text">最終累積總資產：<span class="num-bold" id="totalNominal"></span></div>
+        <div class="row-text">退休每月被動收入(3%提領)：<span class="num-bold" id="monthNominal"></span></div>
+    </div>
 
-        <div class="card card-gray">
-            <div class="tit">實質購買力（扣除通膨2.2%）</div>
-            <div class="row-text">實質資產價值：<span class="num-bold" id="totalReal"></span></div>
-            <div class="row-text">實質每月可運用：<span class="num-bold" id="monthReal"></span></div>
-            <div class="text-small">說明：貼近未來真實物價購買力</div>
-        </div>
+    <div class="card card-gray">
+        <div class="tit">實質購買力（固定通膨2.2%）</div>
+        <div class="row-text">實質資產價值：<span class="num-bold" id="totalReal"></span></div>
+        <div class="row-text">實質每月可運用：<span class="num-bold" id="monthReal"></span></div>
+    </div>
+
+    <div class="advice">
+        <div class="tit">✨ 個人化理財調整建議</div>
+        1. 現有00939+00940 維持躺平，不再額外加碼高股息，避免整體報酬過低。<br>
+        2. 每月定額維持：15000(0050)＋3000(00981A)，成長+配息最平衡。<br>
+        3. 閒置現金保留緊急預備金，剩餘採分批緩進，降低心理壓力。<br>
+        4. 個股改為小部位娛樂倉，不補攤、不加碼，保護退休核心資產。<br>
+        5. 每年年終小額投入ETF，無痛加速複利，退休體質更穩。
     </div>
 </div>
 
 <script>
-// 一次性金額複利
+// 整筆複利
 function calcLump(principal, rate, year){
     return principal * Math.pow(1 + rate, year);
 }
-// 每月定期定額 月複利
+// 每月定額
 function calcMonth(monthMoney, rate, year){
     let monthRate = rate / 12;
     let totalMonth = year * 12;
     return monthMoney * (Math.pow(1 + monthRate, totalMonth) - 1) / monthRate;
+}
+// 每年固定投入複利
+function calcBonus(bonus, rate, year){
+    return bonus * (Math.pow(1+rate, year) - 1) / rate;
 }
 
 function calcAll(){
@@ -172,29 +188,30 @@ function calcAll(){
     let cash = Number(document.getElementById('cash').value);
     let stock = Number(document.getElementById('stockAsset').value);
     let month = Number(document.getElementById('monthSave').value);
+    let bonus = Number(document.getElementById('yearBonus').value);
     let rate = Number(document.getElementById('yearRate').value);
-    let inflate = 0.022;
+    const inflate = 0.022;
 
     let year = retire - age;
 
-    // 名目計算
+    // 名目
     let cashEnd = calcLump(cash, rate, year);
     let stockEnd = calcLump(stock, rate, year);
     let monthEnd = calcMonth(month, rate, year);
-    let totalNominal = cashEnd + stockEnd + monthEnd;
+    let bonusEnd = calcBonus(bonus, rate, year);
+    let totalNominal = cashEnd + stockEnd + monthEnd + bonusEnd;
 
-    // 實質報酬(扣通膨)
+    // 實質
     let realRate = rate - inflate;
     let cashReal = calcLump(cash, realRate, year);
     let stockReal = calcLump(stock, realRate, year);
     let monthReal = calcMonth(month, realRate, year);
-    let totalReal = cashReal + stockReal + monthReal;
+    let bonusReal = calcBonus(bonus, realRate, year);
+    let totalReal = cashReal + stockReal + monthReal + bonusReal;
 
-    // 被動收入 3%提領
     let monthInNominal = totalNominal * 0.03 / 12;
     let monthInReal = totalReal * 0.03 / 12;
 
-    // 輸出格式化
     document.getElementById('yearCount').innerText = `${year} 年`;
     document.getElementById('totalNominal').innerText = Math.round(totalNominal).toLocaleString() + " 元";
     document.getElementById('monthNominal').innerText = Math.round(monthInNominal).toLocaleString() + " 元";
