@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>退休資產複利試算機 beta</title>
+    <title>退休資產複利試算機（調色）</title>
     <style>
         * {
             margin: 0;
@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-            background: #f2f2f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+            background: #f8f9fa;
             min-height: 100vh;
             padding: 20px 12px;
         }
@@ -28,13 +28,13 @@
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10 30px rgba(0, 0, 0, 0.07);
         }
 
         .title {
             font-size: 26px;
             font-weight: 700;
-            color: #1d1d1f;
+            color: #212529;
             text-align: center;
             margin-bottom: 6px;
         }
@@ -42,7 +42,7 @@
         .sub-title {
             text-align: center;
             font-size: 14px;
-            color: #86868b;
+            color: #6c757d;
             margin-bottom: 30px;
         }
 
@@ -54,7 +54,7 @@
             display: block;
             font-size: 15px;
             font-weight: 500;
-            color: #1d1d1f;
+            color: #212529;
             margin-bottom: 8px;
         }
 
@@ -63,30 +63,32 @@
             width: 100%;
             padding: 16px;
             border-radius: 14px;
-            border: 1px solid #d2d2d7;
+            border: 1px solid #dee2e6;
             font-size: 16px;
-            background: #fbfbfc;
+            background: #fdfdfd;
             transition: all 0.2s;
         }
 
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #007aff;
+            border-color: #e63946;
             background: #fff;
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
         }
 
         .tip {
             font-size: 12px;
-            color: #86868b;
+            color: #6c757d;
             margin-top: 6px;
         }
 
+        /* 按鈕：濃郁石榴紅 超有活力 */
         .btn-calc {
             width: 100%;
             padding: 18px;
             border-radius: 14px;
-            background: #007aff;
+            background: #e63946;
             color: #fff;
             font-size: 17px;
             font-weight: 600;
@@ -97,7 +99,7 @@
         }
 
         .btn-calc:hover {
-            background: #0062cc;
+            background: #d62828;
             transform: translateY(-1px);
         }
 
@@ -107,25 +109,28 @@
             margin-bottom: 16px;
         }
 
-        .result-blue {
-            background: #e1f5fe;
-            border-left: 6px solid #007aff;
+        /* 卡片 1：濃郁橘紅（活力、積極） */
+        .result-1 {
+            background: #fff0e3;
+            border-left: 6px solid #ff7d00;
         }
 
-        .result-gray {
-            background: #f5f5f7;
-            border-left: 6px solid #86868b;
+        /* 卡片 2：濃郁墨綠（高級、穩定） */
+        .result-2 {
+            background: #e6f7f0;
+            border-left: 6px solid #2a9d8f;
         }
 
-        .result-orange {
-            background: #fff7e6;
-            border-left: 6px solid #ff9500;
+        /* 卡片 3：濃郁紫（高級、精品） */
+        .result-3 {
+            background: #f7e6ff;
+            border-left: 6px solid #9c27b0;
         }
 
         .section-title {
             font-weight: 700;
             font-size: 16px;
-            color: #1d1d1f;
+            color: #212529;
             margin-bottom: 16px;
         }
 
@@ -134,23 +139,22 @@
             justify-content: space-between;
             padding: 12px 0;
             font-size: 15px;
-            color: #444;
-            border-bottom: 1px solid #f2f2f7;
+            color: #333;
+            border-bottom: 1px solid #f1f1f1;
         }
 
         .row:last-child {
             border-bottom: 0;
         }
 
-        .row .number {
-            font-weight: 700;
-            color: #007aff;
-        }
+        .number-1 { color: #ff7d00; font-weight:700; }
+        .number-2 { color: #2a9d8f; font-weight:700; }
+        .number-3 { color: #9c27b0; font-weight:700; }
 
         .info-bar {
             text-align: center;
             font-size: 13px;
-            color: #86868b;
+            color: #6c757d;
             padding: 12px;
             background: #fff;
             border-radius: 12px;
@@ -159,7 +163,7 @@
 
         .formula-text {
             font-size: 13px;
-            color: #555;
+            color: #444;
             line-height: 1.7;
         }
     </style>
@@ -217,35 +221,35 @@
         </div>
 
         <div class="info-bar">
-            投資年限：<span id="yearCount" style="color:#007aff; font-weight:600;"></span>
+            投資年限：<span id="yearCount" style="color:#e63946; font-weight:600;"></span>
             &nbsp;&nbsp;｜&nbsp;&nbsp;退休規劃至99歲｜通膨2.2%｜3%安全提領
         </div>
 
-        <div class="result-card result-blue">
+        <div class="result-card result-1">
             <div class="section-title">📊 名目金額（未扣通膨）</div>
             <div class="row">
                 <span>最終總資產</span>
-                <span class="number" id="totalNominal"></span>
+                <span class="number-1" id="totalNominal"></span>
             </div>
             <div class="row">
                 <span>每月被動收入</span>
-                <span class="number" id="monthNominal"></span>
+                <span class="number-1" id="monthNominal"></span>
             </div>
         </div>
 
-        <div class="result-card result-gray">
+        <div class="result-card result-2">
             <div class="section-title">🛡️ 實質購買力（扣通膨2.2%）</div>
             <div class="row">
                 <span>實質總資產</span>
-                <span class="number" id="totalReal"></span>
+                <span class="number-2" id="totalReal"></span>
             </div>
             <div class="row">
                 <span>實質每月可支配</span>
-                <span class="number" id="monthReal"></span>
+                <span class="number-2" id="monthReal"></span>
             </div>
         </div>
 
-        <div class="result-card result-orange">
+        <div class="result-card result-3">
             <div class="section-title">📑 運算公式與明細</div>
             <div class="formula-text" id="formulaBox"></div>
         </div>
