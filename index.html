@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通用退休資產複利試算機</title>
+    <title>通用退休資產複利試算機｜附完整算式明細</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             line-height: 1.6;
         }
         .wrap {
-            max-width: 560px;
+            max-width: 580px;
             margin: 0 auto;
             background: #ffffff;
             border-radius: 20px;
@@ -57,10 +57,6 @@
             font-size: 17px;
             margin-top: 8px;
             cursor: pointer;
-            transition: 0.2s;
-        }
-        button:hover {
-            background-color: #2b6cb0;
         }
         .card {
             border-radius: 14px;
@@ -69,6 +65,7 @@
         }
         .card-blue { background: #f3f8ff; }
         .card-gray { background: #f7f8fa; }
+        .card-formula { background: #fef8f0; margin-top:12px; }
         .tit {
             font-weight: 600;
             color: #2d3748;
@@ -77,7 +74,7 @@
         }
         .row-text {
             font-size: 15px;
-            margin: 8px 0;
+            margin: 6px 0;
             color: #4a5568;
         }
         .num-bold {
@@ -87,6 +84,11 @@
         .text-small {
             font-size: 13px;
             color: #718096;
+        }
+        .formula-text {
+            font-size: 13px;
+            color: #5c4b38;
+            line-height: 1.8;
         }
     </style>
 </head>
@@ -104,20 +106,20 @@
     </div>
     <div class="item">
         <label>現有可投資現金</label>
-        <input type="number" id="cash" placeholder="活存、定存、閒置可運用資金">
+        <input type="number" id="cash" placeholder="僅填願意承擔風險之資金，緊急預備金勿填入">
         <div class="text-small">建議保留6~12個月生活費作為緊急預備金</div>
     </div>
     <div class="item">
         <label>股票／ETF 總資產</label>
-        <input type="number" id="stockAsset" placeholder="長期持有之股票、ETF合計金額">
+        <input type="number" id="stockAsset" placeholder="長期持有股票、ETF合計市值">
     </div>
     <div class="item">
         <label>每月定期定額投入</label>
-        <input type="number" id="monthSave" placeholder="每月固定理財金額">
+        <input type="number" id="monthSave" placeholder="每月固定理財投入金額">
     </div>
     <div class="item">
         <label>每年額外獎金投入</label>
-        <input type="number" id="yearBonus" placeholder="年終、獎金等一次性額外投入">
+        <input type="number" id="yearBonus" placeholder="年終、獎金等一次性額外理財">
     </div>
     <div class="item">
         <label>長期年化報酬率</label>
@@ -133,34 +135,47 @@
     <button onclick="calcAll()">開始試算</button>
 
     <div class="row-text" style="margin-top:16px;">投資年限：<span class="num-bold" id="yearCount"></span></div>
+    <div class="text-small">※退休規劃至99歲｜固定通膨2.2%｜3%安全提領(不耗盡本金)</div>
 
+    <!-- 結果區 -->
     <div class="card card-blue">
-        <div class="tit">名目金額（未扣除通膨）</div>
-        <div class="row-text">最終累積總資產：<span class="num-bold" id="totalNominal"></span></div>
-        <div class="row-text">退休每月被動收入｜3%安全提領：<span class="num-bold" id="monthNominal"></span></div>
+        <div class="tit">名目金額（未扣通膨）</div>
+        <div class="row-text">最終總資產：<span class="num-bold" id="totalNominal"></span></div>
+        <div class="row-text">退休每月被動收入：<span class="num-bold" id="monthNominal"></span></div>
     </div>
 
     <div class="card card-gray">
-        <div class="tit">實質購買力｜固定通膨 2.2%</div>
-        <div class="row-text">扣抵通膨後實質資產：<span class="num-bold" id="totalReal"></span></div>
-        <div class="row-text">實質每月可支配收入：<span class="num-bold" id="monthReal"></span></div>
+        <div class="tit">實質購買力（扣通膨2.2%）</div>
+        <div class="row-text">實質總資產：<span class="num-bold" id="totalReal"></span></div>
+        <div class="row-text">實質每月可支配：<span class="num-bold" id="monthReal"></span></div>
+    </div>
+
+    <!-- 完整算式&明細揭露 -->
+    <div class="card card-formula">
+        <div class="tit">📑 運算公式 &amp; 逐筆明細</div>
+        <div class="formula-text" id="formulaBox"></div>
     </div>
 </div>
 
 <script>
-// 整筆一次性資產複利
+// 公式1：整筆一次性複利(現金/股票ETF)
 function calcLump(principal, rate, year){
     return principal * Math.pow(1 + rate, year);
 }
-// 每月定期定額 月複利
+// 公式2：每月定期定額 月複利
 function calcMonth(monthMoney, rate, year){
     let monthRate = rate / 12;
     let totalMonth = year * 12;
     return monthMoney * (Math.pow(1 + monthRate, totalMonth) - 1) / monthRate;
 }
-// 每年固定額外投入複利
+// 公式3：每年年度投入 年複利
 function calcBonus(bonus, rate, year){
     return bonus * (Math.pow(1 + rate, year) - 1) / rate;
+}
+
+// 格式化數字
+function numFormat(n){
+    return Math.round(n).toLocaleString();
 }
 
 function calcAll(){
@@ -179,14 +194,14 @@ function calcAll(){
         return;
     }
 
-    // 名目報酬計算
+    // ===== 名目端計算 =====
     let cashEnd = calcLump(cash, rate, year);
     let stockEnd = calcLump(stock, rate, year);
     let monthEnd = calcMonth(month, rate, year);
     let bonusEnd = calcBonus(bonus, rate, year);
     let totalNominal = cashEnd + stockEnd + monthEnd + bonusEnd;
 
-    // 實質報酬(扣除固定通膨2.2%)
+    // ===== 實質端計算(扣通膨) =====
     let realRate = rate - inflate;
     let cashReal = calcLump(cash, realRate, year);
     let stockReal = calcLump(stock, realRate, year);
@@ -194,16 +209,41 @@ function calcAll(){
     let bonusReal = calcBonus(bonus, realRate, year);
     let totalReal = cashReal + stockReal + monthReal + bonusReal;
 
-    // 3% 安全提領換算月收入
+    // 每月提領
     let monthInNominal = totalNominal * 0.03 / 12;
     let monthInReal = totalReal * 0.03 / 12;
 
-    // 輸出格式化
+    // 基礎結果顯示
     document.getElementById('yearCount').innerText = `${year} 年`;
-    document.getElementById('totalNominal').innerText = Math.round(totalNominal).toLocaleString() + " 元";
-    document.getElementById('monthNominal').innerText = Math.round(monthInNominal).toLocaleString() + " 元";
-    document.getElementById('totalReal').innerText = Math.round(totalReal).toLocaleString() + " 元";
-    document.getElementById('monthReal').innerText = Math.round(monthInReal).toLocaleString() + " 元";
+    document.getElementById('totalNominal').innerText = numFormat(totalNominal) + " 元";
+    document.getElementById('monthNominal').innerText = numFormat(monthInNominal) + " 元";
+    document.getElementById('totalReal').innerText = numFormat(totalReal) + " 元";
+    document.getElementById('monthReal').innerText = numFormat(monthInReal) + " 元";
+
+    // ===== 揭露完整算式+明細 =====
+    let formulaHtml = "";
+    formulaHtml += "【基礎公式】<br>";
+    formulaHtml += "1.整筆資產：終值 = 本金 × (1+年化)^年數<br>";
+    formulaHtml += "2.每月定額：月複利累積公式<br>";
+    formulaHtml += "3.年度投入：年金複利公式<br>";
+    formulaHtml += "4.實質報酬 = 年化 - 通膨(2.2%)<br>";
+    formulaHtml += "5.每月被動收入 = 總資產 × 3% ÷ 12<br><br>";
+
+    formulaHtml += "【名目逐筆終值】<br>";
+    formulaHtml += "• 可投資現金：" + numFormat(cash) + " → " + numFormat(cashEnd) + " 元<br>";
+    formulaHtml += "• 股票ETF資產：" + numFormat(stock) + " → " + numFormat(stockEnd) + " 元<br>";
+    formulaHtml += "• 每月定期定額：每月" + numFormat(month) + " → 累計" + numFormat(monthEnd) + " 元<br>";
+    formulaHtml += "• 每年獎金投入：每年" + numFormat(bonus) + " → 累計" + numFormat(bonusEnd) + " 元<br>";
+    formulaHtml += "→ 名目合計：" + numFormat(totalNominal) + " 元<br><br>";
+
+    formulaHtml += "【實質逐筆終值(扣2.2%通膨)】<br>";
+    formulaHtml += "• 現金最終：" + numFormat(cashReal) + " 元<br>";
+    formulaHtml += "• 股票ETF最終：" + numFormat(stockReal) + " 元<br>";
+    formulaHtml += "• 每月定額累計：" + numFormat(monthReal) + " 元<br>";
+    formulaHtml += "• 年度獎金累計：" + numFormat(bonusReal) + " 元<br>";
+    formulaHtml += "→ 實質合計：" + numFormat(totalReal) + " 元";
+
+    document.getElementById('formulaBox').innerHTML = formulaHtml;
 }
 </script>
 </body>
