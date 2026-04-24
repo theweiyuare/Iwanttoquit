@@ -3,205 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通用退休資產複利試算機｜附完整算式明細</title>
+    <title>退休資產複利試算機</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: "Noto Sans TC", 微軟正黑體, sans-serif;
-            background-color: #f0f4f9;
-            padding: 24px 16px;
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", 微軟正黑體, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #eef2f8 100%);
+            min-height: 100vh;
+            padding: 20px 14px;
         }
-        .wrap {
+
+        .container {
             max-width: 580px;
             margin: 0 auto;
+        }
+
+        .card {
             background: #ffffff;
             border-radius: 20px;
             padding: 28px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
         }
-        h3 {
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
             text-align: center;
-            color: #2d3748;
-            margin-bottom: 24px;
-            font-weight: 600;
+            margin-bottom: 8px;
         }
-        .item {
-            margin-bottom: 16px;
+
+        .sub-title {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 28px;
         }
-        label {
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
             display: block;
-            color: #4a5568;
-            margin-bottom: 6px;
             font-size: 15px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
         }
-        input, select {
+
+        .form-group input,
+        .form-group select {
             width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            background: #fafbfd;
-        }
-        button {
-            width: 100%;
-            padding: 13px;
-            background-color: #3182ce;
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-        .card {
+            padding: 14px 16px;
             border-radius: 14px;
-            padding: 18px;
-            margin-top: 16px;
-        }
-        .card-blue { background: #f3f8ff; }
-        .card-gray { background: #f7f8fa; }
-        .card-formula { background: #fef8f0; margin-top:12px; }
-        .tit {
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 10px;
+            border: 1px solid #e5e7eb;
             font-size: 16px;
+            background: #f9fafb;
+            transition: all 0.2s;
         }
-        .row-text {
-            font-size: 15px;
-            margin: 6px 0;
-            color: #4a5568;
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #fff;
         }
-        .num-bold {
+
+        .tip {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 6px;
+        }
+
+        .btn-calc {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+            color: #fff;
+            font-size: 17px;
             font-weight: 600;
-            color: #2c5282;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .text-small {
+
+        .btn-calc:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .result-card {
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .result-blue {
+            background: #eff6ff;
+        }
+
+        .result-gray {
+            background: #f3f4f6;
+        }
+
+        .result-orange {
+            background: #fffbeb;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 15px;
+            color: #4b5563;
+        }
+
+        .row .number {
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .info-bar {
+            text-align: center;
             font-size: 13px;
-            color: #718096;
+            color: #6b7280;
+            margin: 14px 0;
         }
+
         .formula-text {
             font-size: 13px;
-            color: #5c4b38;
-            line-height: 1.8;
+            color: #78716c;
+            line-height: 1.7;
         }
     </style>
 </head>
+
 <body>
-<div class="wrap">
-    <h3>退休資產複利試算機</h3>
+    <div class="container">
+        <div class="card">
+            <div class="title">退休資產複利試算機</div>
+            <div class="sub-title">長期理財｜安全提領｜透明運算式</div>
 
-    <div class="item">
-        <label>目前年齡</label>
-        <input type="number" id="age" placeholder="例如：36">
-    </div>
-    <div class="item">
-        <label>預計退休年齡</label>
-        <input type="number" id="retireAge" placeholder="例如：60">
-    </div>
-    <div class="item">
-        <label>現有可投資現金</label>
-        <input type="number" id="cash" placeholder="願意承擔風險、未來將投入市場的閒置資金">
-        <div class="text-small">緊急預備金不建議填入，建議保留6~12個月生活費</div>
-    </div>
-    <div class="item">
-        <label>現有股票／ETF 總資產</label>
-        <input type="number" id="stockAsset" placeholder="已持有、長期不賣出的股票與ETF市值">
-    </div>
-    <div class="item">
-        <label>每月定期定額投入</label>
-        <input type="number" id="monthSave" placeholder="每月固定理財投入金額">
-    </div>
-    <div class="item">
-        <label>每年額外獎金投入</label>
-        <input type="number" id="yearBonus" placeholder="年終、獎金等一次性額外理財">
-    </div>
-    <div class="item">
-        <label>長期年化報酬率</label>
-        <select id="yearRate">
-            <option value="0.04">4% 極度保守</option>
-            <option value="0.05">5% 保守穩健</option>
-            <option value="0.06" selected>6% 中性合理</option>
-            <option value="0.07">7% 成長偏強</option>
-            <option value="0.08">8% 樂觀估算</option>
-        </select>
-    </div>
+            <div class="form-group">
+                <label>目前年齡</label>
+                <input type="number" id="age" placeholder="例如：36">
+            </div>
 
-    <button onclick="calcAll()">開始試算</button>
+            <div class="form-group">
+                <label>預計退休年齡</label>
+                <input type="number" id="retireAge" placeholder="例如：60">
+            </div>
 
-    <div class="row-text" style="margin-top:16px;">投資年限：<span class="num-bold" id="yearCount"></span></div>
-    <div class="text-small">※退休規劃至99歲｜固定通膨2.2%｜3%安全提領(不耗盡本金)</div>
+            <div class="form-group">
+                <label>現有可投資現金</label>
+                <input type="number" id="cash" placeholder="願意承擔風險、未來將投入市場的閒置資金">
+                <div class="tip">緊急預備金不建議填入，建議保留6~12個月生活費</div>
+            </div>
 
-    <!-- 結果區 -->
-    <div class="card card-blue">
-        <div class="tit">名目金額（未扣通膨）</div>
-        <div class="row-text">最終總資產：<span class="num-bold" id="totalNominal"></span></div>
-        <div class="row-text">退休每月被動收入：<span class="num-bold" id="monthNominal"></span></div>
+            <div class="form-group">
+                <label>現有股票／ETF 總資產</label>
+                <input type="number" id="stockAsset" placeholder="已持有、長期不賣出的股票與ETF市值">
+            </div>
+
+            <div class="form-group">
+                <label>每月定期定額投入</label>
+                <input type="number" id="monthSave" placeholder="每月固定理財金額">
+            </div>
+
+            <div class="form-group">
+                <label>每年額外獎金投入</label>
+                <input type="number" id="yearBonus" placeholder="年終、獎金等額外投入">
+            </div>
+
+            <div class="form-group">
+                <label>長期年化報酬率</label>
+                <select id="yearRate">
+                    <option value="0.04">4% 極度保守</option>
+                    <option value="0.05">5% 保守穩健</option>
+                    <option value="0.06" selected>6% 中性合理</option>
+                    <option value="0.07">7% 成長偏強</option>
+                    <option value="0.08">8% 樂觀估算</option>
+                </select>
+            </div>
+
+            <button class="btn-calc" onclick="calcAll()">開始試算</button>
+        </div>
+
+        <div class="info-bar">
+            投資年限：<span id="yearCount" style="font-weight:600;"></span>
+            &nbsp;&nbsp;｜&nbsp;&nbsp;退休規劃至99歲、通膨2.2%、3%安全提領
+        </div>
+
+        <div class="result-card result-blue">
+            <div class="section-title">📊 名目金額（未扣通膨）</div>
+            <div class="row">
+                <span>最終總資產</span>
+                <span class="number" id="totalNominal"></span>
+            </div>
+            <div class="row">
+                <span>每月被動收入</span>
+                <span class="number" id="monthNominal"></span>
+            </div>
+        </div>
+
+        <div class="result-card result-gray">
+            <div class="section-title">🛡️ 實質購買力（扣通膨2.2%）</div>
+            <div class="row">
+                <span>實質總資產</span>
+                <span class="number" id="totalReal"></span>
+            </div>
+            <div class="row">
+                <span>實質每月可支配</span>
+                <span class="number" id="monthReal"></span>
+            </div>
+        </div>
+
+        <div class="result-card result-orange">
+            <div class="section-title">📑 運算公式與明細</div>
+            <div class="formula-text" id="formulaBox"></div>
+        </div>
     </div>
-
-    <div class="card card-gray">
-        <div class="tit">實質購買力（扣通膨2.2%）</div>
-        <div class="row-text">實質總資產：<span class="num-bold" id="totalReal"></span></div>
-        <div class="row-text">實質每月可支配：<span class="num-bold" id="monthReal"></span></div>
-    </div>
-
-    <!-- 完整算式&明細揭露 -->
-    <div class="card card-formula">
-        <div class="tit">📑 運算公式 &amp; 逐筆明細</div>
-        <div class="formula-text" id="formulaBox"></div>
-    </div>
-</div>
 
 <script>
-// 公式1：整筆一次性複利(現金/股票ETF)
 function calcLump(principal, rate, year){
     return principal * Math.pow(1 + rate, year);
 }
-// 公式2：每月定期定額 月複利
+
 function calcMonth(monthMoney, rate, year){
-    let monthRate = rate / 12;
+    let mr = rate / 12;
     let totalMonth = year * 12;
-    return monthMoney * (Math.pow(1 + monthRate, totalMonth) - 1) / monthRate;
+    return monthMoney * (Math.pow(1 + mr, totalMonth) - 1) / mr;
 }
-// 公式3：每年年度投入 年複利
+
 function calcBonus(bonus, rate, year){
     return bonus * (Math.pow(1 + rate, year) - 1) / rate;
 }
 
-// 格式化數字
-function numFormat(n){
-    return Math.round(n).toLocaleString();
+function num(n){
+    return Math.round(n).toLocaleString() + " 元";
 }
 
 function calcAll(){
-    let age = Number(document.getElementById('age').value || 0);
-    let retire = Number(document.getElementById('retireAge').value || 0);
-    let cash = Number(document.getElementById('cash').value || 0);
-    let stock = Number(document.getElementById('stockAsset').value || 0);
-    let month = Number(document.getElementById('monthSave').value || 0);
-    let bonus = Number(document.getElementById('yearBonus').value || 0);
+    let age = Number(document.getElementById('age').value||0);
+    let retire = Number(document.getElementById('retireAge').value||0);
+    let cash = Number(document.getElementById('cash').value||0);
+    let stock = Number(document.getElementById('stockAsset').value||0);
+    let month = Number(document.getElementById('monthSave').value||0);
+    let bonus = Number(document.getElementById('yearBonus').value||0);
     let rate = Number(document.getElementById('yearRate').value);
     const inflate = 0.022;
 
     let year = retire - age;
-    if(year <= 0){
-        alert('退休年齡需大於目前年齡');
-        return;
-    }
+    if(year <= 0){ alert('退休年齡需大於目前年齡'); return; }
 
-    // ===== 名目端計算 =====
     let cashEnd = calcLump(cash, rate, year);
     let stockEnd = calcLump(stock, rate, year);
     let monthEnd = calcMonth(month, rate, year);
     let bonusEnd = calcBonus(bonus, rate, year);
     let totalNominal = cashEnd + stockEnd + monthEnd + bonusEnd;
 
-    // ===== 實質端計算(扣通膨) =====
     let realRate = rate - inflate;
     let cashReal = calcLump(cash, realRate, year);
     let stockReal = calcLump(stock, realRate, year);
@@ -209,41 +285,27 @@ function calcAll(){
     let bonusReal = calcBonus(bonus, realRate, year);
     let totalReal = cashReal + stockReal + monthReal + bonusReal;
 
-    // 每月提領
-    let monthInNominal = totalNominal * 0.03 / 12;
-    let monthInReal = totalReal * 0.03 / 12;
+    let monthNom = totalNominal * 0.03 / 12;
+    let monthRe = totalReal * 0.03 / 12;
 
-    // 基礎結果顯示
-    document.getElementById('yearCount').innerText = `${year} 年`;
-    document.getElementById('totalNominal').innerText = numFormat(totalNominal) + " 元";
-    document.getElementById('monthNominal').innerText = numFormat(monthInNominal) + " 元";
-    document.getElementById('totalReal').innerText = numFormat(totalReal) + " 元";
-    document.getElementById('monthReal').innerText = numFormat(monthInReal) + " 元";
+    document.getElementById('yearCount').innerText = year + " 年";
+    document.getElementById('totalNominal').innerText = num(totalNominal);
+    document.getElementById('monthNominal').innerText = num(monthNom);
+    document.getElementById('totalReal').innerText = num(totalReal);
+    document.getElementById('monthReal').innerText = num(monthRe);
 
-    // ===== 揭露完整算式+明細 =====
-    let formulaHtml = "";
-    formulaHtml += "【基礎公式】<br>";
-    formulaHtml += "1.整筆資產：終值 = 本金 × (1+年化)^年數<br>";
-    formulaHtml += "2.每月定額：月複利累積公式<br>";
-    formulaHtml += "3.年度投入：年金複利公式<br>";
-    formulaHtml += "4.實質報酬 = 年化 - 通膨(2.2%)<br>";
-    formulaHtml += "5.每月被動收入 = 總資產 × 3% ÷ 12<br><br>";
-
-    formulaHtml += "【名目逐筆終值】<br>";
-    formulaHtml += "• 可投資現金：" + numFormat(cash) + " → " + numFormat(cashEnd) + " 元<br>";
-    formulaHtml += "• 股票ETF資產：" + numFormat(stock) + " → " + numFormat(stockEnd) + " 元<br>";
-    formulaHtml += "• 每月定期定額：每月" + numFormat(month) + " → 累計" + numFormat(monthEnd) + " 元<br>";
-    formulaHtml += "• 每年獎金投入：每年" + numFormat(bonus) + " → 累計" + numFormat(bonusEnd) + " 元<br>";
-    formulaHtml += "→ 名目合計：" + numFormat(totalNominal) + " 元<br><br>";
-
-    formulaHtml += "【實質逐筆終值(扣2.2%通膨)】<br>";
-    formulaHtml += "• 現金最終：" + numFormat(cashReal) + " 元<br>";
-    formulaHtml += "• 股票ETF最終：" + numFormat(stockReal) + " 元<br>";
-    formulaHtml += "• 每月定額累計：" + numFormat(monthReal) + " 元<br>";
-    formulaHtml += "• 年度獎金累計：" + numFormat(bonusReal) + " 元<br>";
-    formulaHtml += "→ 實質合計：" + numFormat(totalReal) + " 元";
-
-    document.getElementById('formulaBox').innerHTML = formulaHtml;
+    let f = `
+    1.整筆複利：本金 × (1+年化)^年數<br>
+    2.每月定額：月複利標準公式<br>
+    3.實質報酬＝年化－2.2%通膨<br>
+    4.每月收入＝總資產 × 3% ÷ 12<br><br>
+    現金：${num(cash)} → ${num(cashEnd)}<br>
+    股票ETF：${num(stock)} → ${num(stockEnd)}<br>
+    每月定額累積：${num(monthEnd)}<br>
+    獎金累積：${num(bonusEnd)}<br>
+    總計：${num(totalNominal)}
+    `;
+    document.getElementById('formulaBox').innerHTML = f;
 }
 </script>
 </body>
